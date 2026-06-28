@@ -94,7 +94,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     if [ -n "${CXX_VALUE}" ]; then \
         export CXX=${CXX_VALUE}; \
     fi; \
-    export PKG_CONFIG_PATH="/usr/lib/pkgconfig"; \
+    export PKG_CONFIG_PATH="/usr/lib/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig"; \
     export PKG_CONFIG_LIBDIR="${PKG_CONFIG_PATH}"; \
     export CGO_CFLAGS="-I/opt/vosk/libvosk"; \
     export CGO_LDFLAGS="-L/opt/vosk/libvosk -Wl,-rpath=/opt/vosk/libvosk -lvosk -lopus -lopusfile -lsodium -lasound -ldl -lpthread"; \
