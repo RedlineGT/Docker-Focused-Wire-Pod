@@ -4,9 +4,35 @@
 
 It allows voice commands to work with any Vector 1.0 or 2.0 for no fee, including regular production robots.
 
-## Installation
+## Docker based Installation
 
-The installation guide exists on the wiki: [Installation guide](https://github.com/kercre123/wire-pod/wiki/Installation)
+This requires the host to posess either the hostname of escapepod.local or have an mDNS configuration for it
+
+On a Debian based system you can setup an mDNS alias as follows:
+
+install avahi-utils
+sudo apt install avahi-utils
+create a systemd service config
+# /etc/systemd/system/avahi-alias@.service
+[Unit]
+Description=Publish %I as alias for %H.local via mdns
+
+[Service]
+Type=simple
+ExecStart=/bin/bash -c "/usr/bin/avahi-publish -a -R %I $(avahi-resolve -4 -n %H.local | cut -f 2)"
+
+[Install]
+WantedBy=multi-user.target
+Start the service and enable it's persistence
+sudo systemctl enable --now avahi-alias@escapepod.local.service
+Now you can proceed with the docker portion.
+
+On the device you would like to install wire-pod on, make sure you have docker installed. This can be done with the command sudo apt install docker-ce for linux.
+Verify if the docker engine is working with the command sudo service docker status
+Run this command to create and download the wire-pod application
+docker compose up -d -f https://raw.githubusercontent.com/kercre123/wire-pod/main/compose.yaml
+With a device on the same network as wire-pod, open a browser and head to the configuration page. http://your_ip:8080/. In that page, follow the instructions. Wire-pod should then be set up!
+Continue on to "Authenticate the bot with wire-pod", near the bottom of this page.
 
 ## Wiki
 
