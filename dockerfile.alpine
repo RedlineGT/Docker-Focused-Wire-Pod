@@ -107,8 +107,8 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     echo "${BUILD_COMMIT}" >/build/.wirepod-version
 
 
-# Runtime stage - Bellsoft Alpaquita (glibc-based Alpine alternative)
-FROM bellsoft/alpaquita-linux-base:latest AS runtime
+# Runtime stage - Frolvlad's Alpine + glibc (optimized minimal base)
+FROM frolvlad/alpine-glibc:latest AS runtime
 
 ARG COMMIT_SHA=unknown
 
@@ -117,19 +117,17 @@ ENV WIREPOD_DATA_DIR=/data \
 
 # Install runtime dependencies
 RUN set -eux; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends \
-        avahi-daemon \
+    apk add --no-cache \
+        avahi \
         bash \
         ca-certificates \
         curl \
-        libasound2 \
-        libopus0 \
-        libopusfile0 \
-        libsodium23 \
-        libsox3 \
-        tzdata; \
-    rm -rf /var/lib/apt/lists/*
+        alsa-lib \
+        opus \
+        opusfile \
+        libsodium \
+        sox \
+        tzdata
 
 WORKDIR /opt/wire-pod
 
