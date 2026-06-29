@@ -1,22 +1,38 @@
+# Git and version control
+.git
+.gitignore
 .github
+
+# IDE and editor files
 .idea
 .vscode
-*.log
-*.tmp
 *.swp
 *.swo
+
+# Build and logs
+*.log
+*.tmp
+
+# Docker files (don't copy compose into image)
 Dockerfile
+Dockerfile.full
+Dockerfile.slim
+dockerfile
+dockerfile.alpine
+dockerfile.alpine-test
 docker-compose.yml
 docker-compose.yaml
 compose.yml
 compose.yaml
 compose.override.yml
+
+# Runtime state and caches
 node_modules
 vendor
-vosk
-stt
-whisper.cpp
-vector-cloud/build
+
+# Test/Development data (not needed in production image)
+*.pcm
+stttest.pcm
 chipper/session-certs
 chipper/jdocs
 chipper/apiConfig.json
@@ -25,4 +41,21 @@ chipper/customIntents.json
 chipper/pico.key
 chipper/useepod
 chipper/source.sh
+
+# Build artifacts and temporary files
+vector-cloud/build
+vosk
+stt
+whisper.cpp
+
+# Security: Embedded keys and certificates
+# Development cert/key for mDNS (should be mounted at runtime, never embedded)
+chipper/epod/
+# Picovoice credentials (if used)
+chipper/pico.key
+# Session certificates (temporary, regenerate per deployment)
+chipper/session-certs/
+
+# Environment and secrets
 .env
+.env.local
