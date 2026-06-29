@@ -112,13 +112,15 @@ ARG COMMIT_SHA=unknown
 ENV WIREPOD_DATA_DIR=/data \
     LD_LIBRARY_PATH=/opt/vosk/libvosk
 
-# Install runtime dependencies
+# Install runtime dependencies including git and C++ libraries
 RUN set -eux; \
     apk add --no-cache \
         avahi \
         bash \
         ca-certificates \
         curl \
+        git \
+        libstdc++ \
         alsa-lib \
         opus \
         opusfile \
