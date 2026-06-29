@@ -177,6 +177,12 @@ COPY --from=builder /src /opt/wire-pod
 COPY --from=builder /build/chipper /opt/wire-pod/chipper/chipper
 COPY --from=builder /build/.wirepod-version /opt/wire-pod/.wirepod-version
 
+# SECURITY: Remove embedded keys and certificates (should not be in production image)
+RUN rm -rf \
+    /opt/wire-pod/chipper/epod/ \
+    /opt/wire-pod/chipper/pico.key \
+    /opt/wire-pod/chipper/session-certs/
+
 # Make scripts executable
 RUN chmod +x \
         /opt/wire-pod/setup.sh \
