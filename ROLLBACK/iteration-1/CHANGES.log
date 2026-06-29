@@ -1,0 +1,16 @@
+Iteration 1: Remove Startup Output Wrapper
+Date: 2026-06-28
+Action: Reverted entrypoint.sh to original (no custom startup output)
+Reason: User chose Option B - let chipper app handle output naturally
+
+Files Modified:
+- docker/entrypoint.sh: Removed print_startup_info() function
+
+Files Backed Up:
+- docker/entrypoint.sh
+
+To Rollback:
+  cp ROLLBACK/iteration-1/entrypoint.sh docker/
+  docker compose up -d --build
+
+Status: Ready to test

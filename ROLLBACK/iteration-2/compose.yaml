@@ -1,0 +1,95 @@
+services:
+  wire-pod:
+    container_name: wire-pod
+    hostname: escapepod
+    build:
+      context: .
+      # Choose your variant:
+      # - Dockerfile.full  → Production (Alpine, 180MB, minimal output)
+      # - Dockerfile.slim  → Debug/Dev (Ubuntu, 630MB, detailed output)
+      dockerfile: Dockerfile.full
+    # Image tag will determine startup output:
+    # - Contains "debug" → Detailed debug output with tools list
+    # - Otherwise → Clean production output
+    image: ghcr.io/kercre123/wire-pod:main
+    # For debug variant, use:
+    # image: ghcr.io/kercre123/wire-pod:debug
+    restart: unless-stopped
+
+    environment:
+      WIREPOD_DATA_DIR: /data
+      # Optional: override STT service (vosk, whisper.cpp, leopard, etc.)
+      # WIREPOD_STT_SERVICE: vosk
+      # Optional: enable debug logging
+      # WIREPOD_DEBUG_LOGGING: "true"
+      # Optional: set STT language
+      # WIREPOD_STT_LANGUAGE: en
+      # Optional: Picovoice API key (if using Leopard/Rhino)
+      # WIREPOD_PICOVOICE_APIKEY: your-api-key-here
+
+    # Host network mode: enables mDNS (zeroconf) broadcasts to reach host network
+    # Exposed ports: 80 (HTTP), 443 (HTTPS), 8080 (Web UI), 8084 (STT debug)
+    # See DEPLOYMENT_GUIDELINES.md for port details
+    network_mode: "host"
+
+    volumes:
+      # Persistent data volume (configs, certs, models, session state)
+      - wire-pod-data:/data
+
+    # Security and resource limits
+    # WARNING: Currently runs as root for audio device access.
+    # If you want to test non-root, uncomment the line below and verify:
+    # 1. Audio device access still works
+    # 2. File permissions don't break startup
+    # See DOCKER_ANALYSIS.md for details
+    # user: "1000:1000"
+
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE  # Allow binding to ports 80/443
+
+    # Resource limits (adjust based on your hardware)
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '1'
+          memory: 512M
+
+    # Health check configuration
+    healthcheck:
+      # Test if web UI is responsive
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/ok"]
+      # Check every 30 seconds
+      interval: 30s
+      # Wait 5 seconds for response
+      timeout: 5s
+      # Fail after 3 consecutive failures
+      retries: 3
+      # Wait 15 seconds before first check (startup time)
+      start_period: 15s
+
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        labels: "service=wire-pod"
+
+    # Pull policy: use local image if available, otherwise pull from registry
+    pull_policy: missing
+
+volumes:
+  wire-pod-data:
+    driver: local
+    # Docker manages this volume automatically
+    # Data is stored in Docker's default volume location
+    # To use a custom path, uncomment below and adjust:
+    # driver_opts:
+    #   type: none
+    #   o: bind
+    #   device: /path/to/persistent/storage

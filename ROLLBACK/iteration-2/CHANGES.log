@@ -1,0 +1,33 @@
+=== ROLLBACK: Iteration 2 - Host Network Mode + Remove Avahi ===
+Date: 2026-06-29 03:50 UTC (approximately)
+Reason: Enable mDNS discovery via host network mode
+
+FILES CHANGED:
+1. compose.yaml
+   - Removed: ports: section (lines 30-34)
+   - Added: network_mode: "host"
+   - Purpose: Allow zeroconf broadcasts to reach host network
+
+2. Dockerfile.full
+   - Removed: avahi from apk add --no-cache
+   - Reason: Unused dependency (Wire-Pod uses zeroconf, not Avahi)
+   - Benefit: Reduces image size + CVE surface
+
+3. Dockerfile.slim
+   - Removed: avahi-daemon and avahi-utils from apt-get install
+   - Reason: Unused dependency (Wire-Pod uses zeroconf, not Avahi)
+   - Benefit: Reduces image size + CVE surface
+
+ROLLBACK PROCEDURE (if needed):
+1. cd ~/Projects/Docker-Focused-Wire-Pod
+2. docker compose down
+3. cp ROLLBACK/iteration-2/compose.yaml .
+4. cp ROLLBACK/iteration-2/Dockerfile.full .
+5. cp ROLLBACK/iteration-2/Dockerfile.slim .
+6. ./build.sh --prod
+7. docker compose up
+
+EXPECTED OUTCOME AFTER THIS CHANGE:
+- escapepod.local resolves without DNS error
+- Vector robot can discover the server
+- Web UI accessible at escapepod.local:8080
